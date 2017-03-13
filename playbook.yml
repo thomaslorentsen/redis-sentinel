@@ -1,6 +1,9 @@
 ---
 - hosts: redis
   become: yes
-  tasks:
-    - debug: msg="hello world"
+  roles:
+    - remi
+    - common
+    - redis/server
+    - redis/sentinel
 ...

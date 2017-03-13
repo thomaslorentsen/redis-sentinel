@@ -1,0 +1,37 @@
+---
+- name: remove mymaster config from sentinel
+  lineinfile:
+    dest: /etc/redis-sentinel.conf
+    regexp: 'sentinel.*mymaster'
+    state: absent
+
+- name: set redis server to monitor in sentinel
+  lineinfile:
+    dest: /etc/redis-sentinel.conf
+    regexp: '(# *)?sentinel monitor {{ inventory_hostname }}'
+    line: 'sentinel monitor {{ inventory_hostname }} 127.0.0.1 6379 2'
+
+- name: set redis server down timeout in sentinel
+  lineinfile:
+    dest: /etc/redis-sentinel.conf
+    regexp: '(# *)?sentinel down-after-milliseconds {{ inventory_hostname }}'
+    line: 'sentinel down-after-milliseconds {{ inventory_hostname }} 5000'
+
+- name: set redis server failover timeout in sentinel
+  lineinfile:
+    dest: /etc/redis-sentinel.conf
+    regexp: '(# *)?sentinel failover-timeout {{ inventory_hostname }}'
+    line: 'sentinel failover-timeout {{ inventory_hostname }} 60000'
+
+- name: set redis server password in sentinel
+  lineinfile:
+    dest: /etc/redis-sentinel.conf
+    regexp: '(# *)?sentinel auth-pass {{ inventory_hostname }}'
+    line: 'sentinel auth-pass {{ inventory_hostname }} foobared'
+
+- name: start redis sentinel
+  service:
+    name: redis-sentinel
+    state: restarted
+    enabled: yes
+...

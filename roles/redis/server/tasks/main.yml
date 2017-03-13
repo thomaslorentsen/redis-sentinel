@@ -1,0 +1,27 @@
+---
+- name: install redis server
+  package:
+    name: redis-3.2.8
+    state: present
+    enablerepo: remi
+
+- name: bind redis to all ip addresses
+  lineinfile:
+    dest: /etc/redis.conf
+    regexp: '(# *)?bind'
+    state: absent
+  notify: restart redis server
+
+- name: set redis server password
+  lineinfile:
+    dest: /etc/redis.conf
+    regexp: '(# *)?requirepass'
+    line: 'requirepass foobared'
+  notify: restart redis server
+
+- name: start redis server
+  service:
+    name: redis
+    state: started
+    enabled: yes
+...

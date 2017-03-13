@@ -1,0 +1,6 @@
+---
+- name: install remi repository
+  package:
+    name: https://rpms.remirepo.net/enterprise/remi-release-6.rpm
+    state: present
+...
