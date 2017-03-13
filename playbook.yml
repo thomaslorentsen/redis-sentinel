@@ -1,0 +1,6 @@
+---
+- hosts: redis
+  become: yes
+  tasks:
+    - debug: msg="hello world"
+...
