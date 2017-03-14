@@ -19,6 +19,22 @@
     line: 'requirepass foobared'
   notify: restart redis server
 
+- name: insert slave config
+  lineinfile:
+    dest: /etc/redis.conf
+    regexp: '^slaveof '
+    line: "slaveof {{ hostvars['redis1']['ansible_eth1']['ipv4']['address'] }} 6379"
+  when: "hostvars['redis1']['ansible_eth1']['ipv4']['address'] != hostvars[inventory_hostname]['ansible_eth1']['ipv4']['address']"
+  notify:
+    - restart redis server
+
+- name: insert slave config
+  lineinfile:
+    dest: /etc/redis.conf
+    regexp: '^masterauth '
+    line: 'masterauth foobared'
+  when: "hostvars['redis1']['ansible_eth1']['ipv4']['address'] != hostvars[inventory_hostname]['ansible_eth1']['ipv4']['address']"
+
 - name: start redis server
   service:
     name: redis
