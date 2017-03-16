@@ -5,5 +5,10 @@
     - remi
     - common
     - redis/server
+
+- hosts: redis
+  become: yes
+  serial: 1
+  roles:
     - redis/sentinel
 ...

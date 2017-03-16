@@ -19,12 +19,33 @@
     line: 'requirepass foobared'
   notify: restart redis server
 
-- name: insert slave config
+- name: set redis server master password
+  lineinfile:
+    dest: /etc/redis.conf
+    regexp: '(# *)?masterauth'
+    line: 'masterauth foobared'
+  notify: restart redis server
+
+- name: set master address
+  set_fact:
+    master_ip: "{{ hostvars['redis1']['ansible_eth1']['ipv4']['address'] }}"
+
+- name: insert slave config into slaves
   lineinfile:
     dest: /etc/redis.conf
     regexp: '^slaveof '
-    line: "slaveof {{ hostvars['redis1']['ansible_eth1']['ipv4']['address'] }} 6379"
-  when: "hostvars['redis1']['ansible_eth1']['ipv4']['address'] != hostvars[inventory_hostname]['ansible_eth1']['ipv4']['address']"
+    line: "slaveof {{ master_ip }} 6379"
+  when: "master_ip != hostvars[inventory_hostname]['ansible_eth1']['ipv4']['address']"
+  notify:
+    - restart redis server
+
+- name: remove slave config from master
+  lineinfile:
+    dest: /etc/redis.conf
+    regexp: '^slaveof '
+    state: absent
+  run_once: true
+  delegate_to: redis1
   notify:
     - restart redis server
 

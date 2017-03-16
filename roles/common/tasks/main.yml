@@ -5,4 +5,11 @@
     state: present
   with_items:
     - nano
+
+- name: tune socket
+  lineinfile:
+    dest: /etc/sysctl.conf
+    regexp: 'net.core.somaxconn ='
+    line: 'net.core.somaxconn = 511'
+  notify: restart sysctl
 ...

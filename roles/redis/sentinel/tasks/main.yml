@@ -1,20 +1,29 @@
 ---
-- name: remove mymaster config from sentinel
-  lineinfile:
-    dest: /etc/redis-sentinel.conf
-    regexp: 'sentinel.*mymaster'
-    state: absent
+- name: stop redis sentinel
+  service:
+    name: redis-sentinel
+    state: stopped
 
 - name: set redis sentinel config
   template:
     src: redis-sentinel.conf
     dest: /etc/redis-sentinel.conf
-  notify:
-    - restart redis sentinel
 
 - name: start redis sentinel
   service:
     name: redis-sentinel
     state: started
+  register: start_sentinel
+
+- name: enable redis sentinel
+  service:
+    name: redis-sentinel
     enabled: yes
+
+- name: wait 30 seconds for sentinel to start
+  wait_for:
+    port: 26379
+    host: "{{ hostvars[inventory_hostname]['ansible_eth1']['ipv4']['address'] }}"
+    delay: 30
+  when: start_sentinel.changed
 ...

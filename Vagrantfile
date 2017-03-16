@@ -4,12 +4,9 @@
 Vagrant.configure(2) do |config|
   config.vm.box = "boxcutter/centos68"
   config.vm.box_version = "2.0.16"
-
-  if Vagrant.has_plugin?("vagrant-cachier")
-    config.cache.scope = :box
-    config.cache.synced_folder_opts = {
-        type: :virtualbox
-      }
+  config.vm.provider "virtualbox" do |vb|
+    vb.memory = "256"
+    vb.cpus = 1
   end
 
   boxes = [
